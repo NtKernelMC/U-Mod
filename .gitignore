@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+/.vs
+/U-Mod/.vs/U-Mod
+/U-Mod/Release
+/U-Mod_Injector/Win32/Debug
+/U-Mod_Injector/__astcache
+/U-Mod_Injector/__history
