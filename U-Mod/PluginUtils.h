@@ -11,6 +11,7 @@
 #include <optional>
 #include <ctime>
 #include <cwctype>
+#include <map>
 #include <sstream>
 #include <codecvt>
 #include "xorstr.h"
@@ -56,6 +57,8 @@ bool HackInjectAvailable = false;
 std::string gLuaCode = "";
 std::string gLuaArg = "";
 char inp_txt[256];
+std::map<std::string, DWORD> CModelsList;
+std::string status_message = "STATUS: ---";
 char* strdel(char* s, int pos, int n)
 {
 	char* dst = s + pos, * src = s + pos + n;

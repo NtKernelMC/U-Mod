@@ -9,31 +9,31 @@ void ApplyImGuiTheme()
     ImVec4* colors = ImGui::GetStyle().Colors;
     colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
     colors[ImGuiCol_TextDisabled] = ImVec4(0.73f, 0.75f, 0.74f, 1.00f);
-    colors[ImGuiCol_WindowBg] = ImVec4(0.09f, 0.09f, 0.09f, 0.94f);
+    colors[ImGuiCol_WindowBg] = ImVec4(0.09f, 0.09f, 0.09f, 1.00f); // Убрана прозрачность, фон теперь полностью непрозрачный
     colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-    colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
+    colors[ImGuiCol_PopupBg] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f); // Тёмно-серый цвет для фона выпадающего списка
     colors[ImGuiCol_Border] = ImVec4(0.20f, 0.20f, 0.20f, 0.50f);
     colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-    colors[ImGuiCol_FrameBg] = ImVec4(0.71f, 0.39f, 0.39f, 0.54f);
-    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.84f, 0.66f, 0.66f, 0.40f);
-    colors[ImGuiCol_FrameBgActive] = ImVec4(0.84f, 0.66f, 0.66f, 0.67f);
-    colors[ImGuiCol_TitleBg] = ImVec4(0.47f, 0.22f, 0.22f, 0.67f);
-    colors[ImGuiCol_TitleBgActive] = ImVec4(0.47f, 0.22f, 0.22f, 1.00f);
-    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.47f, 0.22f, 0.22f, 0.67f);
+    colors[ImGuiCol_FrameBg] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f); // Тёмно-серый для фона неактивного комбобокса
+    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f); // Немного светлее тёмно-серого для фона комбобокса при наведении
+    colors[ImGuiCol_FrameBgActive] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f); // Ещё чуть светлее тёмно-серого для фона активного комбобокса
+    colors[ImGuiCol_TitleBg] = ImVec4(1.00f * 0.5, 0.55f * 0.5, 0.00f, 0.67f); // Темнее оранжевый для заголовка окна
+    colors[ImGuiCol_TitleBgActive] = ImVec4(1.00f * 0.5, 0.55f * 0.5, 0.00f, 1.00f); // Темнее оранжевый когда окно активно
+    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.00f * 0.5, 0.55f * 0.5, 0.00f, 0.67f); // Темнее оранжевый для свёрнутого заголовка
     colors[ImGuiCol_MenuBarBg] = ImVec4(0.34f, 0.16f, 0.16f, 1.00f);
     colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
     colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
     colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
     colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
-    colors[ImGuiCol_CheckMark] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+    colors[ImGuiCol_CheckMark] = ImVec4(1.00f, 0.55f, 0.00f, 1.00f); // Оранжевый для галочек
     colors[ImGuiCol_SliderGrab] = ImVec4(0.71f, 0.39f, 0.39f, 1.00f);
     colors[ImGuiCol_SliderGrabActive] = ImVec4(0.84f, 0.66f, 0.66f, 1.00f);
-    colors[ImGuiCol_Button] = ImVec4(0.47f, 0.22f, 0.22f, 0.65f);
-    colors[ImGuiCol_ButtonHovered] = ImVec4(0.71f, 0.39f, 0.39f, 0.65f);
-    colors[ImGuiCol_ButtonActive] = ImVec4(0.20f, 0.20f, 0.20f, 0.50f);
-    colors[ImGuiCol_Header] = ImVec4(0.71f, 0.39f, 0.39f, 0.54f);
-    colors[ImGuiCol_HeaderHovered] = ImVec4(0.84f, 0.66f, 0.66f, 0.65f);
-    colors[ImGuiCol_HeaderActive] = ImVec4(0.84f, 0.66f, 0.66f, 0.00f);
+    colors[ImGuiCol_Button] = ImVec4(1.00f, 0.55f, 0.00f, 0.65f); // Оранжевый для кнопок
+    colors[ImGuiCol_ButtonHovered] = ImVec4(1.00f, 0.65f, 0.00f, 0.65f); // Оранжевый при наведении
+    colors[ImGuiCol_ButtonActive] = ImVec4(1.00f, 0.55f, 0.00f, 0.80f); // Оранжевый при нажатии
+    colors[ImGuiCol_Header] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f); // Тёмно-серый для фона элемента выпадающего списка
+    colors[ImGuiCol_HeaderHovered] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f); // Немного светлее тёмно-серого для фона элемента при наведении
+    colors[ImGuiCol_HeaderActive] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f); // Ещё чуть светлее тёмно-серого для фона активного элемента
     colors[ImGuiCol_Separator] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
     colors[ImGuiCol_SeparatorHovered] = ImVec4(0.71f, 0.39f, 0.39f, 0.54f);
     colors[ImGuiCol_SeparatorActive] = ImVec4(0.71f, 0.39f, 0.39f, 0.54f);
@@ -112,7 +112,55 @@ const RECT*, const RECT*, HWND wnd, const RGNDATA*)
         ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse);
         ImGui::Image(texture, ImVec2(610, 166));
         ImGui::BeginChild(xorstr_("main"), ImVec2(0, 0), true, ImGuiWindowFlags_NoScrollbar);
-        // gui code
+        ////////////////////// gui code //////////////////////////////////////////////////////////
+        static const char* current_select = "All players are Offline!";
+        if (ImGui::BeginChild(xorstr_("ChildDrawList"), ImVec2(605, 200), true))
+        {
+            for (const auto& item : CModelsList)
+            {
+                bool is_selected = (current_select == item.first.c_str());
+                if (ImGui::Selectable(item.first.c_str(), is_selected))
+                {
+                    current_select = item.first.c_str();
+                    if (is_selected)
+                    {
+                        ImGui::SetItemDefaultFocus();
+                        //VictimNick = item;
+                    }
+                }
+            }
+            ImGui::EndChild();
+        }
+        if (ImGui::Button(cp1251_to_utf8(xorstr_("Обновить список")).c_str()))
+        {
+
+        }
+        ImGui::SameLine();
+        if (ImGui::Button(cp1251_to_utf8(xorstr_("Применить")).c_str()))
+        {
+            
+        }
+        ImGui::SameLine();
+        if (ImGui::Button(cp1251_to_utf8(xorstr_("Сбросить")).c_str()))
+        {
+
+        }
+        const char* mtype_items[] = { xorstr_("Player"), xorstr_("Vehicle"), xorstr_("Weapon") };
+        static const char* mtype_current = NULL;
+        if (ImGui::BeginCombo(cp1251_to_utf8(xorstr_("Тип модели")).c_str(), mtype_current))
+        {
+            for (int n = 0; n < IM_ARRAYSIZE(mtype_items); n++)
+            {
+                bool is_selected = (mtype_current == mtype_items[n]);
+                if (ImGui::Selectable(mtype_items[n], is_selected)) mtype_current = mtype_items[n];
+                {
+                    if (is_selected) ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::BulletText(status_message.c_str());
+        /////////////////////////////////////////////////////////////////////////////////////////
         ImGui::EndChild();
         ImGui::End();
     }
