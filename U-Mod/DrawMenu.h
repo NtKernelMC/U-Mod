@@ -198,7 +198,7 @@ const RECT*, const RECT*, HWND wnd, const RGNDATA*)
             {
                 std::thread async_dropper(DropModel, current_select);
                 async_dropper.detach();
-                status_message = cp1251_to_utf8(xorstr_("STATUS: Выбранная модель сброшена! Перезайдите в игру."));
+                status_message = cp1251_to_utf8(xorstr_("STATUS: Выбранная модель сброшена! Перезайдите на сервер."));
                 MessageBeep(MB_ICONINFORMATION);
                 std::thread ack(CancelMessage);
                 ack.detach();
