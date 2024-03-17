@@ -35,7 +35,18 @@ NTSTATUS __stdcall hkLdrLoadDll(PWCHAR PathToFile, ULONG Flags, PUNICODE_STRING 
     }
     if (w_findStringIC(wstrModuleFileName, xorstr_(L"client.dll")))
     {
-        MessageBeep(MB_ICONASTERISK);
+        MessageBeep(MB_ICONASTERISK); SigScan scan;
+        callStartGame = (ptrStartGame)scan.FindPattern(xorstr_("client.dll"),
+        xorstr_("\x55\x8B\xEC\x6A\xFF\x68\x00\x00\x00\x00\x64\xA1\x00\x00\x00\x00\x50\x81\xEC\xA0\x01"),
+        xorstr_("xxxxxx????xxxxxxxxxxx"));
+        if (callStartGame != nullptr)
+        {
+            MH_RemoveHook(callStartGame);
+            MH_CreateHook(callStartGame, &StartGame, reinterpret_cast<LPVOID*>(&callStartGame));
+            MH_EnableHook(MH_ALL_HOOKS);
+            LogInFile(LOG_NAME, xorstr_("[PLUGIN] Found address from signature to StartGame!\n"));
+        }
+        else LogInFile(LOG_NAME, xorstr_("[FAILURE] Can`t find a signature for StartGame.\n"));
         callLuaLoadBuffer = (t_LuaLoadBuffer)GetProcAddress(GetModuleHandleA(xorstr_("lua5.1c.dll")), xorstr_("luaL_loadbuffer"));
         if (callLuaLoadBuffer != nullptr)
         {

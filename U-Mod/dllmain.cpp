@@ -49,8 +49,6 @@ extern "C" __declspec(dllexport) int NextHook(int code, WPARAM wParam, LPARAM lP
 void HackThread()
 {
     MH_Initialize();
-    std::thread mdl_loader(LoadCustomModels);
-    mdl_loader.detach();
     LogInFile(LOG_NAME, xorstr_("[LOG] U-Mod %s by DroidZero loaded!\n"), PLUGIN_VER);
     InstallDx9Hooks();
     callLdrLoadDll = (ptrLdrLoadDll)GetProcAddress(GetModuleHandleA(xorstr_("ntdll.dll")), xorstr_("LdrLoadDll"));

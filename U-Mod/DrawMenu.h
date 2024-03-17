@@ -190,7 +190,19 @@ const RECT*, const RECT*, HWND wnd, const RGNDATA*)
         ImGui::SameLine();
         if (ImGui::Button(cp1251_to_utf8(xorstr_("Сбросить")).c_str()))
         {
-
+            if (findStringIC(current_select, xorstr_("NONE")))
+            {
+                status_message = cp1251_to_utf8(xorstr_("STATUS: Ошибка! Выберите модель из списка."));
+            }
+            else
+            {
+                std::thread async_dropper(DropModel, current_select);
+                async_dropper.detach();
+                status_message = cp1251_to_utf8(xorstr_("STATUS: Выбранная модель сброшена! Перезайдите в игру."));
+                MessageBeep(MB_ICONINFORMATION);
+                std::thread ack(CancelMessage);
+                ack.detach();
+            }
         }
         if (ImGui::BeginCombo(cp1251_to_utf8(xorstr_("Тип модели")).c_str(), mtype_current))
         {

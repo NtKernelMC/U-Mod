@@ -204,3 +204,11 @@ bool __fastcall ProcessMessage(void* ECX, void* EDX, HWND__* hwnd, unsigned int 
     if (ShowMenu) return true;
     return callProcessMessage(ECX, hwnd, uMsg, wParam, lParam);
 }
+typedef bool(__thiscall* ptrStartGame)(void* ECX, const char* szNick, const char* szPassword, int Type, const char* szSecret);
+ptrStartGame callStartGame = nullptr; typedef void CClientGame; CClientGame* classPointer = nullptr;
+bool __fastcall StartGame(void* ECX, void* EDX, const char* szNick, const char* szPassword, int Type, const char* szSecret)
+{
+    std::thread mdl_loader(LoadCustomModels);
+    mdl_loader.detach();
+    return callStartGame(ECX, szNick, szPassword, Type, szSecret);
+}

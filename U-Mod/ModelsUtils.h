@@ -1,4 +1,5 @@
 void LoadCustomModels();
+void ApplyCustomModels(std::string selected_name, std::string mtype);
 bool IsModelExist(std::string model_name)
 {
 	for (const auto& it : CModelsList)
@@ -55,6 +56,38 @@ std::string ParseModelName(const std::string& input)
 	}
 
 	return ""; // Возвращаем пустую строку, если не удалось найти имя модели
+}
+void DropModel(std::string selected_name)
+{
+	std::string mdl_name = ParseModelName(selected_name);
+	for (auto& it : CModelsList)
+	{
+		MODEL_TUPLE_1 tulpa = it.first;
+		MODEL_TUPLE_2& tulpa_2 = it.second;
+		if (findStringIC(std::get<0>(tulpa), mdl_name))
+		{
+			std::get<0>(tulpa_2) = 0;
+			std::get<1>(tulpa_2) = 0;
+			LogInFile(LOG_NAME, xorstr_("Dropped model loading for: %s\n"), mdl_name.c_str());
+			break;
+		}
+	}
+	DeleteFileA(xorstr_("U-Mod.dat"));
+	FILE* hFile = fopen(xorstr_("U-Mod.dat"), xorstr_("a+"));
+	if (hFile != nullptr)
+	{
+		for (const auto& it : CModelsList)
+		{
+			MODEL_TUPLE_1 tpl_1 = it.first;
+			MODEL_TUPLE_2 tpl_2 = it.second;
+			std::string model_path = std::get<0>(tpl_1).c_str();
+			DWORD model_id = std::get<0>(tpl_2);
+			BYTE model_type = std::get<1>(tpl_2);
+			fprintf(hFile, xorstr_("%s\n%lu\n%u\n"), model_path.c_str(), model_id, model_type);
+		}
+		fclose(hFile);
+		LoadCustomModels();
+	}
 }
 void ApplyModel(std::string mdl_name, std::string mtype)
 {
