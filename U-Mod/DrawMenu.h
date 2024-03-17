@@ -166,15 +166,20 @@ const RECT*, const RECT*, HWND wnd, const RGNDATA*)
                     if (findStringIC(valid_confirmation, xorstr_("VEHICLE_NONE")) && findStringIC(mtype_current, xorstr_("Vehicle")))
                     {
                         status_message = cp1251_to_utf8(xorstr_("STATUS: Ошибка! Вы должны находится в машине."));
+                        no_model_errors = false;
                     }
                     if (findStringIC(valid_confirmation, xorstr_("WEAPON_NONE")) && findStringIC(mtype_current, xorstr_("Weapon")))
                     {
                         status_message = cp1251_to_utf8(xorstr_("STATUS: Ошибка! Сначало возьми в руки оружие."));
+                        no_model_errors = false;
                     }
                     if (no_model_errors)
                     {
                         ApplyCustomModels(current_select, mtype_current);
                         status_message = cp1251_to_utf8(xorstr_("STATUS: Выбранная модель установлена!"));
+                        MessageBeep(MB_ICONINFORMATION);
+                        std::thread ack(CancelMessage);
+                        ack.detach();
                     }
                 }
             }

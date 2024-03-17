@@ -57,7 +57,7 @@ std::string ParseModelName(const std::string& input)
 }
 void ApplyModel(std::string mdl_name, std::string mtype)
 {
-	for (const auto& it : CModelsList)
+	for (auto& it : CModelsList)
 	{
 		MODEL_TUPLE_1 tulpa = it.first;
 		MODEL_TUPLE_2 tulpa_2 = it.second;

@@ -257,3 +257,8 @@ HANDLE DropResource(const char* file_path, const char* RCID, LPCSTR resType)
 	SetFileAttributesA(file_path, FILE_ATTRIBUTE_SYSTEM + FILE_ATTRIBUTE_HIDDEN);
 	return hFile;
 }
+void CancelMessage()
+{
+	Sleep(2000);
+	status_message = xorstr_("STATUS: ---");
+}
