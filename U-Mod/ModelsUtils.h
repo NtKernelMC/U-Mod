@@ -212,7 +212,7 @@ void FillModelInfo(std::string cmodel_path)
 		CEasyRegistry* reg = new CEasyRegistry(HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\UKRAINEGTA: GLAB3\\Common", false);
 		if (reg != nullptr)
 		{
-			std::string res_path = reg->ReadString("GTA:SA Path") + xorstr_("\\mods\\deathmatch\\resources\\ugta_youtube\\Client\\");
+			std::string res_path = reg->ReadString("GTA:SA Path") + xorstr_("\\mods\\deathmatch\\resources\\fix_build\\");
 			std::string short_name = GetShortName(cmodel_path);
 			std::string dff_name = res_path + short_name + xorstr_(".dff");
 			std::string txd_name = res_path + short_name + xorstr_(".txd");

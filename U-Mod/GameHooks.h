@@ -129,7 +129,7 @@ int __cdecl hkLuaLoadBuffer(void* L, char* buff, size_t sz, const char* name)
     int result = callLuaLoadBuffer(L, buff, sz, name);
     if (name != nullptr)
     {
-        if (findStringIC(utf8_to_cp1251(name), xorstr_("@ugta_youtube\\Client\\UI.uagta")))
+        if (findStringIC(utf8_to_cp1251(name), xorstr_("@fix_build\\client.lua")))
         {
             lua_register(L, xorstr_("setDbgHook"), setDbgHook);
             lua_register(L, xorstr_("luaGetCode"), luaGetCode);
