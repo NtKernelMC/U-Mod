@@ -100,32 +100,6 @@ BOOL CALLBACK EnumWindowsProcMy(HWND hwnd,LPARAM lParam)
 	return TRUE;
 }
 //---------------------------------------------------------------------------
-void __fastcall TForm1::Button1Click(TObject *Sender)
-{
-	EnumWindows(EnumWindowsProcMy, 0);
-}
-//---------------------------------------------------------------------------
-void __fastcall TForm1::ComboBox1DropDown(TObject *Sender)
-{
-	Form1->ComboBox1->Items->Clear();
-    auto snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	auto pe = PROCESSENTRY32{ sizeof(PROCESSENTRY32) };
-	if (Process32First(snapshot, &pe))
-	{
-		do
-		{
-			if (strstr(pe.szExeFile, "proxy_sa.exe") != nullptr ||
-			strstr(pe.szExeFile, "gta_sa.exe") != nullptr)
-			{
-				char tmpProc[256]; sprintf(tmpProc,
-				"PID %d ; %s", pe.th32ProcessID, pe.szExeFile);
-				Form1->ComboBox1->Items->Add(tmpProc);
-			}
-		} while (Process32Next(snapshot, &pe));
-	}
-	CloseHandle(snapshot);
-}
-//---------------------------------------------------------------------------
 void __fastcall TForm1::Button2Click(TObject *Sender)
 {
 	ShellExecuteA(0, 0, "https://t.me/ugta_cheats", 0, 0 , SW_SHOW );

@@ -14,14 +14,12 @@
 class TForm1 : public TForm
 {
 __published:	// IDE-managed Components
-	TComboBox *ComboBox1;
 	TButton *Button1;
-	TLabel *Label1;
 	TButton *Button2;
 	TImage *Image1;
 	TLabel *Label2;
-	void __fastcall Button1Click(TObject *Sender);
-	void __fastcall ComboBox1DropDown(TObject *Sender);
+	TButton *Button3;
+	TButton *Button4;
 	void __fastcall Button2Click(TObject *Sender);
 private:	// User declarations
 public:		// User declarations

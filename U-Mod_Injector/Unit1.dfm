@@ -4,7 +4,7 @@ object Form1: TForm1
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'U-Mod by DroidZero'
-  ClientHeight = 500
+  ClientHeight = 499
   ClientWidth = 323
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -5634,19 +5634,6 @@ object Form1: TForm1
     0000000000000000000000000000000000000000000000000000000000800100
     0080010000C0030000F00F0000}
   TextHeight = 13
-  object Label1: TLabel
-    Left = 96
-    Top = 354
-    Width = 140
-    Height = 16
-    Caption = #1042#1099#1073#1077#1088#1080#1090#1077' '#1087#1088#1086#1094#1077#1089#1089' '#1080#1075#1088#1099
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    ParentFont = False
-  end
   object Image1: TImage
     Left = 0
     Top = 0
@@ -57758,8 +57745,8 @@ object Form1: TForm1
     Stretch = True
   end
   object Label2: TLabel
-    Left = 96
-    Top = 311
+    Left = 104
+    Top = 319
     Width = 121
     Height = 25
     Caption = 'by DroidZero'
@@ -57770,30 +57757,37 @@ object Form1: TForm1
     Font.Style = []
     ParentFont = False
   end
-  object ComboBox1: TComboBox
-    Left = 72
-    Top = 384
-    Width = 185
-    Height = 21
-    TabOrder = 0
-    OnDropDown = ComboBox1DropDown
-  end
   object Button1: TButton
     Left = 72
-    Top = 411
+    Top = 355
     Width = 185
     Height = 25
-    Caption = #1055#1086#1076#1075#1088#1091#1079#1080#1090#1100' '#1074' '#1080#1075#1088#1091
-    TabOrder = 1
-    OnClick = Button1Click
+    Caption = #1059#1089#1090#1072#1085#1086#1074#1080#1090#1100' '#1084#1086#1076
+    TabOrder = 0
   end
   object Button2: TButton
     Left = -8
-    Top = 459
+    Top = 457
     Width = 345
     Height = 41
     Caption = 't.me/ugta_cheats | '#1055#1086#1089#1077#1090#1080#1090#1100' '#1075#1088#1091#1087#1087#1091' '#1088#1072#1079#1088#1072#1073#1086#1090#1095#1080#1082#1072
-    TabOrder = 2
+    TabOrder = 1
     OnClick = Button2Click
+  end
+  object Button3: TButton
+    Left = 72
+    Top = 386
+    Width = 185
+    Height = 25
+    Caption = #1059#1076#1072#1083#1080#1090#1100' '#1084#1086#1076
+    TabOrder = 2
+  end
+  object Button4: TButton
+    Left = 72
+    Top = 417
+    Width = 185
+    Height = 25
+    Caption = #1048#1079#1084#1077#1085#1080#1090#1100' '#1076#1080#1088#1077#1082#1090#1086#1088#1080#1102' '#1084#1086#1076#1077#1083#1077#1081
+    TabOrder = 3
   end
 end

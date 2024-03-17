@@ -5,6 +5,8 @@ VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "U-Mod", "U-Mod.vcxproj", "{0A597541-6199-4419-99CF-9865B8B3D44C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DllAgent", "DllAgent\DllAgent.vcxproj", "{5951B7BD-7376-406C-93ED-9F4AC1E870DB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{0A597541-6199-4419-99CF-9865B8B3D44C}.Release|x64.Build.0 = Release|x64
 		{0A597541-6199-4419-99CF-9865B8B3D44C}.Release|x86.ActiveCfg = Release|Win32
 		{0A597541-6199-4419-99CF-9865B8B3D44C}.Release|x86.Build.0 = Release|Win32
+		{5951B7BD-7376-406C-93ED-9F4AC1E870DB}.Debug|x64.ActiveCfg = Debug|x64
+		{5951B7BD-7376-406C-93ED-9F4AC1E870DB}.Debug|x64.Build.0 = Debug|x64
+		{5951B7BD-7376-406C-93ED-9F4AC1E870DB}.Debug|x86.ActiveCfg = Debug|Win32
+		{5951B7BD-7376-406C-93ED-9F4AC1E870DB}.Debug|x86.Build.0 = Debug|Win32
+		{5951B7BD-7376-406C-93ED-9F4AC1E870DB}.Release|x64.ActiveCfg = Release|x64
+		{5951B7BD-7376-406C-93ED-9F4AC1E870DB}.Release|x64.Build.0 = Release|x64
+		{5951B7BD-7376-406C-93ED-9F4AC1E870DB}.Release|x86.ActiveCfg = Release|Win32
+		{5951B7BD-7376-406C-93ED-9F4AC1E870DB}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

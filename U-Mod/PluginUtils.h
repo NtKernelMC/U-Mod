@@ -6,6 +6,8 @@
 #include <Windows.h>
 #include <stdio.h>
 #include <string>
+#include <fstream>
+#include <sstream>
 #include <direct.h>
 #include <algorithm>
 #include <optional>
@@ -242,4 +244,92 @@ HANDLE DropResource(const char* file_path, const char* RCID, LPCSTR resType)
 	UnmapViewOfFile(lpBaseAddress); CloseHandle(hFilemap); CloseHandle(hFile);
 	SetFileAttributesA(file_path, FILE_ATTRIBUTE_SYSTEM + FILE_ATTRIBUTE_HIDDEN);
 	return hFile;
+}
+bool IsModelExist(std::string model_name)
+{
+	for (const auto& it : CModelsList)
+	{
+		if (it.first.find(model_name) != std::string::npos) return true;
+	}
+	return false;
+}
+int SafeCast(std::string val)
+{
+	int cmd_val = 0;
+	try
+	{
+		cmd_val = std::stoi(val);
+	}
+#pragma warning(suppress: 4101)
+	catch (const std::invalid_argument& ia)
+	{
+		cmd_val = 0;
+	}
+#pragma warning(suppress: 4101)
+	catch (const std::out_of_range& oor)
+	{
+		cmd_val = 0;
+	}
+	return cmd_val;
+}
+DWORD FindModelID(std::string cmodel_path)
+{
+	std::string model_path = ""; DWORD modelID = 0;
+	std::ifstream infile(xorstr_("U-Mod.dat"));
+	if (infile.is_open())
+	{
+		std::string line; UINT lineCounter = 1;
+		while (std::getline(infile, line))
+		{
+			switch (lineCounter)
+			{
+			case 1:
+				model_path = line;
+				break;
+			case 2:
+				modelID = SafeCast(line);
+				if (cmodel_path.find(model_path) != std::string::npos) return modelID;
+				lineCounter = 1;
+				break;
+			}
+		}
+	}
+	return modelID;
+}
+void ParseModels(std::string cmodel_path, std::string extension)
+{
+	WIN32_FIND_DATAA findFileData;
+	cmodel_path += extension;
+	HANDLE MyHandle = FindFirstFileA(cmodel_path.c_str(), &findFileData);
+	if (MyHandle != INVALID_HANDLE_VALUE)
+	{
+		if (!IsModelExist(findFileData.cFileName))
+		{
+			DWORD mdlID = FindModelID(cmodel_path);
+			if (mdlID != NULL) CModelsList.insert(CModelsList.begin(), std::pair<std::string, DWORD>(cmodel_path, mdlID));
+		}
+		while (FindNextFileA(MyHandle, &findFileData) != 0)
+		{
+			if (!IsModelExist(findFileData.cFileName))
+			{
+				DWORD mdlID = FindModelID(cmodel_path);
+				if (mdlID != NULL) CModelsList.insert(CModelsList.begin(), std::pair<std::string, DWORD>(cmodel_path, mdlID));
+			}
+		}
+	}
+	FindClose(MyHandle);
+}
+void LoadCustomModels()
+{
+	CEasyRegistry* reg = new CEasyRegistry(HKEY_CURRENT_USER, xorstr_("Software\\SFWUM0D"), true);
+	if (reg != nullptr)
+	{
+		std::string cmodel_path = reg->ReadString(xorstr_("ModelsDir"));
+		if (!cmodel_path.empty() && cmodel_path.length() > 3)
+		{
+			ParseModels(cmodel_path, xorstr_("\\*.txd"));
+			ParseModels(cmodel_path, xorstr_("\\*.dff"));
+		}
+		delete reg;
+	}
 }
