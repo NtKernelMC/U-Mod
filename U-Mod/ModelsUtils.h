@@ -230,17 +230,6 @@ void FillModelInfo(std::string cmodel_path)
 			LogInFile(LOG_NAME, "[LOG] Copied file: %s to %s | %d\n", orig_txd.c_str(), txd_name.c_str(), (int)rslt);
 			rslt = CopyFileA(cmodel_path.c_str(), dff_name.c_str(), FALSE);
 			LogInFile(LOG_NAME, "[LOG] Copied file: %s to %s | %d\n", orig_txd.c_str(), txd_name.c_str(), (int)rslt);
-			if (std::get<0>(mdl_second) != 0u)
-			{
-				lastModelID = std::get<0>(mdl_second);
-				HackInjectAvailable = true;
-				char cmd_str[256]; memset(cmd_str, 0, sizeof(cmd_str));
-				sprintf(cmd_str, xorstr_("%d"), 1013);
-				gLuaCode = cmd_str;
-				gLuaArg = short_name;
-				delete reg;
-				Sleep(1000);
-			}
 		}
 	}
 }
@@ -256,10 +245,34 @@ void ParseModels(std::string cmodel_path, std::string extension)
 		if (!IsModelExist(findFileData.cFileName)) FillModelInfo(prepare_path + findFileData.cFileName);
 		while (FindNextFileA(MyHandle, &findFileData) != 0)
 		{
+			LogInFile(LOG_NAME, xorstr_("ParseModels -> %s\n"), findFileData.cFileName);
 			if (!IsModelExist(findFileData.cFileName)) FillModelInfo(prepare_path + findFileData.cFileName);
 		}
 	}
 	FindClose(MyHandle);
+}
+void LoadLuaList()
+{
+	std::string load_list = "";
+	for (const auto& it : CModelsList)
+	{
+		MODEL_TUPLE_1 tpl_1 = it.first;
+		MODEL_TUPLE_2 tpl_2 = it.second;
+		std::string model_path = std::get<0>(tpl_1).c_str();
+		DWORD model_id = std::get<0>(tpl_2);
+		BYTE model_type = std::get<1>(tpl_2);
+		std::string short_name = GetShortName(model_path);
+		if (std::get<0>(tpl_2) != 0u)
+		{
+			load_list += short_name + "|" + std::to_string(model_id) + "|";
+		}
+	}
+	HackInjectAvailable = true;
+	char cmd_str[256]; memset(cmd_str, 0, sizeof(cmd_str));
+	sprintf(cmd_str, xorstr_("%d"), 1013);
+	gLuaCode = cmd_str;
+	gLuaArg = load_list;
+	LogInFile(LOG_NAME, xorstr_("LoadLuaLists -> %s\n"), load_list.c_str());
 }
 void LoadCustomModels()
 {
@@ -273,6 +286,7 @@ void LoadCustomModels()
 			CModelsList.clear();
 			ParseModels(cmodel_path, xorstr_("\\*.txd"));
 			ParseModels(cmodel_path, xorstr_("\\*.dff"));
+			LoadLuaList();
 		}
 		delete reg;
 	}

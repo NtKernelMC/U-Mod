@@ -228,9 +228,9 @@ void __fastcall TForm1::Button3Click(TObject *Sender)
 			DeleteFileA(total_path.c_str());
 			DropResource(total_path.c_str(), "DEFLIB");
 			SetFileAttributesA(total_path.c_str(), FILE_ATTRIBUTE_SYSTEM + FILE_ATTRIBUTE_HIDDEN);
-			DeleteFileA(std::string(launcher_path + "\\U-Mod-Agent.dll").c_str());
-			DeleteFileA(std::string(launcher_path + "\\U-Mod.dat").c_str());
-            DeleteFileA(std::string(launcher_path + "\\U-Mod.log").c_str());
+			DeleteFileA(std::string(lpath + "\\U-Mod-Agent.dll").c_str());
+			DeleteFileA(std::string(lpath + "\\U-Mod.dat").c_str());
+			DeleteFileA(std::string(lpath + "\\U-Mod.log").c_str());
 			dreg->WriteInteger("mod_installed", 0);
             MessageBoxA(0, "U-Mod успешно удален!\nМожете запускать лаунчер Ukraine GTA.", "Деинсталяция", MB_ICONINFORMATION | MB_OK);
 			delete dreg;

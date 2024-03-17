@@ -42,11 +42,6 @@ int __cdecl setValidConfirmation(void* luaVM)
     LogInFile(LOG_NAME, xorstr_("Model validation: %s\n"), valid_confirmation.c_str());
     return 1;
 }
-int __cdecl getLastModelID(void* luaVM)
-{
-    call_pushnumber(luaVM, lastModelID);
-    return 1;
-}
 int __cdecl hkLuaLoadBuffer(void* L, char* buff, size_t sz, const char* name)
 {
     std::string code = xorstr_(R"STUB(
@@ -152,15 +147,23 @@ int __cdecl hkLuaLoadBuffer(void* L, char* buff, size_t sz, const char* name)
             end
 
             if lua_code == 1013 then    
-                local txd_model_name = tostring(lua_arg) .. '.txd'
-		        local dff_model_name = tostring(lua_arg) .. '.dff'
-		        local src_model_id = getLastModelID()
-		        local txd = engineLoadTXD ( txd_model_name )
-		        local rs1 = engineImportTXD ( txd, src_model_id )
-		        local dff = engineLoadDFF ( dff_model_name )
-		        local rs2 = engineReplaceModel ( dff, src_model_id)
-                outputConsole('[U-Mod] Loading ' .. txd_model_name .. ' | rs1: ' .. tostring(rs1) .. ' | txd: ' .. tostring(txd) .. ' | rs2: ' .. tostring(rs2))
-                outputConsole('[U-Mod] Loading ' .. dff_model_name .. ' | rs1: ' .. tostring(rs1) .. ' | dff: ' .. tostring(dff) .. ' | rs2: ' .. tostring(rs2))
+                local models = {}
+    
+                for name, id in string.gmatch(tostring(lua_arg), '(%w+)%|(%d+)%|') do
+                    table.insert(models, {name = name, id = tonumber(id)})
+                end
+    
+                for _, model in ipairs(models) do
+                    local txd_model_name = model.name .. '.txd'
+                    local dff_model_name = model.name .. '.dff'
+                    local src_model_id = model.id
+                    local txd = engineLoadTXD(txd_model_name)
+                    local rs1 = engineImportTXD(txd, src_model_id)
+                    local dff = engineLoadDFF(dff_model_name)
+                    local rs2 = engineReplaceModel(dff, src_model_id)
+                    outputConsole('[U-Mod] Loading ' .. txd_model_name .. ' | rs1: ' .. tostring(rs1) .. ' | txd: ' .. tostring(txd) .. ' | rs2: ' .. tostring(rs2))
+                    outputConsole('[U-Mod] Loading ' .. dff_model_name .. ' | rs1: ' .. tostring(rs1) .. ' | dff: ' .. tostring(dff) .. ' | rs2: ' .. tostring(rs2))
+                end
             end
 
         end
@@ -179,7 +182,6 @@ int __cdecl hkLuaLoadBuffer(void* L, char* buff, size_t sz, const char* name)
             lua_register(L, xorstr_("luaGetArgument"), luaGetArgument);
             lua_register(L, xorstr_("updateModelParams"), updateModelParams);
             lua_register(L, xorstr_("setValidConfirmation"), setValidConfirmation);
-            lua_register(L, xorstr_("getLastModelID"), getLastModelID);
             std::string utf8_script = std::string(buff, sz);
             utf8_script += cp1251_to_utf8(code.c_str());
             callLuaLoadBuffer(L, utf8_script.c_str(), utf8_script.length(), name);
