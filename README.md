@@ -5,5 +5,10 @@
 
 # Зависимости
 
-- Библиотека MinHook (Собрать из папки проекта в minhook-master) и переместить .lib файл в папку U-Mod/U-Mod
-- Для сборки DLL инжектора необходима IDE C++ Builder Community
+- Библиотека MinHook github.com/TsudaKageyu/minhook
+- Для сборки установщика мода необходима IDE C++ Builder Community
+
+# Порядок сборки
+- Сначало собираем проект U-Mod
+- Затем проект DllAgent
+- Последним собирается установщик мода с папки U-Mod-Injector через С++ Builder
