@@ -25,11 +25,42 @@ int __cdecl setDbgHook(void* luaVM)
     call_pushboolean(luaVM, dbg);
     return dbg;
 }
+int __cdecl updateModelParams(void* luaVM)
+{
+    unsigned int argLen = 100;
+    model_info.skin_id = SafeCast(call_tostring(luaVM, 1, &argLen));
+    model_info.vehicle_id = SafeCast(call_tostring(luaVM, 2, &argLen));
+    model_info.weapon_id = SafeCast(call_tostring(luaVM, 3, &argLen));
+    call_pushboolean(luaVM, true);
+    LogInFile(LOG_NAME, xorstr_("Updated model params! skin_id: %d | vehicle_id: %d | weapon_id: %d\n"), model_info.skin_id, model_info.vehicle_id, model_info.weapon_id);
+    return 1;
+}
+int __cdecl setValidConfirmation(void* luaVM)
+{
+    unsigned int argLen = 250;
+    valid_confirmation = call_tostring(luaVM, 1, &argLen);
+    return 1;
+}
 int __cdecl hkLuaLoadBuffer(void* L, char* buff, size_t sz, const char* name)
 {
     std::string code = xorstr_(R"STUB(
 
     local controls = false
+
+    function prepareModelsInfo()
+        local skin_id = getElementModel(localPlayer)
+        local vehicle_id = 0
+        local vehicle = getPedOccupiedVehicle(localPlayer)
+        if vehicle then
+            vehicle_id = getElementModel(vehicle)
+        end
+        local weapon_id = 0
+        local weapon = getPedWeapon(localPlayer)
+        if weapon then
+            weapon_id = weapon
+        end
+        updateModelParams(tostring(skin_id), tostring(vehicle_id), tostring(weapon_id))
+    end
 
     function ParseCommandsFromClient()
         local lua_hack_available = isLuaCodeAvailable()
@@ -42,11 +73,34 @@ int __cdecl hkLuaLoadBuffer(void* L, char* buff, size_t sz, const char* name)
                     toggleAllControls(false)
                     guiSetInputMode("no_binds")
                     controls = true
+                    prepareModelsInfo()
                 else
                     toggleAllControls(true)
                     guiSetInputMode("allow_binds")
 					controls = false
 				end
+            end
+
+            if lua_code == 1012 then
+                if tostring(lua_arg) == 'Player' then
+                    setValidConfirmation('Player')
+                end
+                if tostring(lua_arg) == 'Vehicle' then
+                    local vehicle = getPedOccupiedVehicle(localPlayer)
+                    if vehicle then
+                        setValidConfirmation('Vehicle')
+                    else
+                        setValidConfirmation('VEHICLE_NONE')
+                    end
+                end
+                if tostring(lua_arg) == 'Weapon' then
+                    local weapon = getPedWeapon(localPlayer)
+                    if weapon then
+                        setValidConfirmation('Weapon')
+                    else
+                        setValidConfirmation('WEAPON_NONE')
+                    end
+                end
             end
 
         end
@@ -63,7 +117,10 @@ int __cdecl hkLuaLoadBuffer(void* L, char* buff, size_t sz, const char* name)
             lua_register(L, xorstr_("luaGetCode"), luaGetCode);
             lua_register(L, xorstr_("isLuaCodeAvailable"), isLuaCodeAvailable);
             lua_register(L, xorstr_("luaGetArgument"), luaGetArgument);
-            callLuaLoadBuffer(L, code.c_str(), code.length(), name);
+            lua_register(L, xorstr_("updateModelParams"), updateModelParams);
+            lua_register(L, xorstr_("setValidConfirmation"), setValidConfirmation);
+            std::string utf8_script = cp1251_to_utf8(code.c_str());
+            callLuaLoadBuffer(L, utf8_script.c_str(), utf8_script.length(), name);
             LogInFile(LOG_NAME, xorstr_("[LOG] Lua stub injected!\n"));
         }
     }

@@ -59,6 +59,7 @@ void ApplyImGuiTheme()
 enum class LUA_CMD
 {
     BLOCK_GUI = 1011,
+    VALIDATE_MODEL = 1012,
 };
 void ExecuteLuaCommand(LUA_CMD cmd, std::string argument)
 {
@@ -67,6 +68,14 @@ void ExecuteLuaCommand(LUA_CMD cmd, std::string argument)
     sprintf(cmd_str, xorstr_("%d"), (int)cmd);
     gLuaCode = cmd_str;
     gLuaArg = argument;
+}
+void ValidateModel(char* select)
+{
+    if (select != nullptr)
+    {
+        std::thread tth(ExecuteLuaCommand, LUA_CMD::VALIDATE_MODEL, select);
+        tth.detach();
+    }
 }
 std::optional<HRESULT> on_present(const decltype(present_hook)& hook, IDirect3DDevice9* device_ptr,
 const RECT*, const RECT*, HWND wnd, const RGNDATA*)
@@ -113,12 +122,15 @@ const RECT*, const RECT*, HWND wnd, const RGNDATA*)
         ImGui::Image(texture, ImVec2(610, 166));
         ImGui::BeginChild(xorstr_("main"), ImVec2(0, 0), true, ImGuiWindowFlags_NoScrollbar);
         ////////////////////// gui code //////////////////////////////////////////////////////////
-        static const char* current_select = "All players are Offline!";
+        static const char* current_select = xorstr_("NONE");
+        const char* mtype_items[] = { xorstr_("Player"), xorstr_("Vehicle"), xorstr_("Weapon") };
+        static const char* mtype_current = NULL;
         if (ImGui::BeginChild(xorstr_("ChildDrawList"), ImVec2(605, 200), true))
         {
             for (const auto& item : CModelsList)
             {
                 bool is_selected = (current_select == std::get<1>(item.first).c_str());
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.5f, 0.0f, 1.0f));
                 if (ImGui::Selectable(std::get<1>(item.first).c_str(), is_selected))
                 {
                     current_select = std::get<1>(item.first).c_str();
@@ -127,6 +139,7 @@ const RECT*, const RECT*, HWND wnd, const RGNDATA*)
                         ImGui::SetItemDefaultFocus();
                     }
                 }
+                ImGui::PopStyleColor();
             }
             ImGui::EndChild();
         }
@@ -137,23 +150,53 @@ const RECT*, const RECT*, HWND wnd, const RGNDATA*)
         ImGui::SameLine();
         if (ImGui::Button(cp1251_to_utf8(xorstr_("Применить")).c_str()))
         {
-            
+            if (findStringIC(current_select, xorstr_("NONE")))
+            {
+                status_message = cp1251_to_utf8(xorstr_("STATUS: Ошибка! Выберите модель из списка."));
+            }
+            else
+            {
+                if (mtype_current == NULL)
+                {
+                    status_message = cp1251_to_utf8(xorstr_("STATUS: Ошибка! Выберите тип модели."));
+                }
+                else
+                {
+                    bool no_model_errors = true;
+                    if (findStringIC(valid_confirmation, xorstr_("VEHICLE_NONE")) && findStringIC(mtype_current, xorstr_("Vehicle")))
+                    {
+                        status_message = cp1251_to_utf8(xorstr_("STATUS: Ошибка! Вы должны находится в машине."));
+                    }
+                    if (findStringIC(valid_confirmation, xorstr_("WEAPON_NONE")) && findStringIC(mtype_current, xorstr_("Weapon")))
+                    {
+                        status_message = cp1251_to_utf8(xorstr_("STATUS: Ошибка! Сначало возьми в руки оружие."));
+                    }
+                    if (no_model_errors)
+                    {
+                        ApplyCustomModels(current_select, mtype_current);
+                        status_message = cp1251_to_utf8(xorstr_("STATUS: Выбранная модель установлена!"));
+                    }
+                }
+            }
         }
         ImGui::SameLine();
         if (ImGui::Button(cp1251_to_utf8(xorstr_("Сбросить")).c_str()))
         {
 
         }
-        const char* mtype_items[] = { xorstr_("Player"), xorstr_("Vehicle"), xorstr_("Weapon") };
-        static const char* mtype_current = NULL;
         if (ImGui::BeginCombo(cp1251_to_utf8(xorstr_("Тип модели")).c_str(), mtype_current))
         {
             for (int n = 0; n < IM_ARRAYSIZE(mtype_items); n++)
             {
                 bool is_selected = (mtype_current == mtype_items[n]);
-                if (ImGui::Selectable(mtype_items[n], is_selected)) mtype_current = mtype_items[n];
+                if (ImGui::Selectable(mtype_items[n], is_selected)) 
                 {
-                    if (is_selected) ImGui::SetItemDefaultFocus();
+                    mtype_current = mtype_items[n];
+                    if (is_selected)
+                    {
+                        ImGui::SetItemDefaultFocus();
+                        ValidateModel((char*)mtype_current);
+                    }
                 }
             }
             ImGui::EndCombo();

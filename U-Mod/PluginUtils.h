@@ -56,6 +56,7 @@ lua_pushstring call_pushstring = nullptr;
 char LuaCode[50000];
 bool InjectAvailable = false;
 bool HackInjectAvailable = false;
+std::string valid_confirmation = "";
 std::string gLuaCode = "";
 std::string gLuaArg = "";
 char inp_txt[256];
@@ -64,6 +65,13 @@ typedef std::pair<std::tuple<std::string, std::string>, std::tuple<DWORD, BYTE>>
 typedef std::tuple<std::string, std::string> MODEL_TUPLE_1;
 typedef std::tuple<DWORD, BYTE> MODEL_TUPLE_2;
 MODEL_CONTAINER CModelsList;
+typedef struct
+{
+	DWORD skin_id;
+	DWORD vehicle_id;
+	DWORD weapon_id;
+} MOD_PARAMS;
+MOD_PARAMS model_info;
 std::string status_message = "STATUS: ---";
 char* strdel(char* s, int pos, int n)
 {

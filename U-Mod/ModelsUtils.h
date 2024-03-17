@@ -42,6 +42,70 @@ MODEL_TUPLE_2 GetSecondTuple(MODEL_CONTAINER container)
 	}
 	return std::make_tuple(0, 0);
 }
+std::string ParseModelName(const std::string& input) 
+{
+	std::size_t startPos = input.find(": ");
+	std::size_t endPos = input.find(" |");
+
+	if (startPos != std::string::npos && endPos != std::string::npos && startPos < endPos) 
+	{
+		startPos += 2; // Сдвигаем на два символа, чтобы пропустить ": "
+		return input.substr(startPos, endPos - startPos);
+	}
+
+	return ""; // Возвращаем пустую строку, если не удалось найти имя модели
+}
+void ApplyModel(std::string mdl_name, std::string mtype)
+{
+	for (const auto& it : CModelsList)
+	{
+		MODEL_TUPLE_1 tulpa = it.first;
+		MODEL_TUPLE_2 tulpa_2 = it.second;
+		if (findStringIC(std::get<0>(tulpa), mdl_name))
+		{
+			if (model_info.skin_id != 0u && findStringIC(mtype, xorstr_("Player")))
+			{
+				std::get<0>(tulpa_2) = model_info.skin_id;
+				std::get<1>(tulpa_2) = 1;
+			}
+			if (model_info.vehicle_id != 0u && findStringIC(mtype, xorstr_("Vehicle")))
+			{
+				std::get<0>(tulpa_2) = model_info.vehicle_id;
+				std::get<1>(tulpa_2) = 2;
+			}
+			if (model_info.weapon_id != 0u && findStringIC(mtype, xorstr_("Weapon")))
+			{
+				std::get<0>(tulpa_2) = model_info.weapon_id;
+				std::get<1>(tulpa_2) = 3;
+			}
+			// копируем модель в директорию ресурса
+			// шлем запрос на загрузку модели в луа
+			LogInFile(LOG_NAME, xorstr_("Applied params to model: %s\n"), mdl_name.c_str());
+			break;
+		}
+	}
+}
+void ApplyCustomModels(std::string selected_name, std::string mtype)
+{
+	std::string mdl_name = ParseModelName(selected_name);
+	LogInFile(LOG_NAME, xorstr_("Applying model with name: %s\n"), mdl_name.c_str());
+	DeleteFileA(xorstr_("U-Mod.dat"));
+	FILE* hFile = fopen(xorstr_("U-Mod.dat"), xorstr_("a+"));
+	if (hFile != nullptr)
+	{
+		ApplyModel(mdl_name, mtype);
+		for (const auto& it : CModelsList)
+		{
+			MODEL_TUPLE_1 tpl_1 = it.first;
+			MODEL_TUPLE_2 tpl_2 = it.second;
+			std::string model_path = std::get<0>(tpl_1).c_str();
+			DWORD model_id = std::get<0>(tpl_2);
+			BYTE model_type = std::get<1>(tpl_2);
+			fprintf(hFile, xorstr_("%s\n%d\n%d\n"), model_path, model_id, model_type);
+		}
+		fclose(hFile);
+	}
+}
 MODEL_CONTAINER ReadModelInfo(std::string cmodel_path)
 {
 	if (cmodel_path.empty()) cmodel_path = xorstr_("ReadModelInfo - empty path.");
@@ -53,6 +117,7 @@ MODEL_CONTAINER ReadModelInfo(std::string cmodel_path)
 		std::string line; UINT lineCounter = 1;
 		while (std::getline(infile, line))
 		{
+			if (line.empty()) continue;
 			switch (lineCounter)
 			{
 			case 1:
@@ -81,14 +146,31 @@ MODEL_CONTAINER ReadModelInfo(std::string cmodel_path)
 	tmp_model.insert(tmp_model.begin(), MODEL_PAIR(tpl_1, tpl_2));
 	return tmp_model;
 }
-std::string GetShortName(std::string cmodel_path)
+std::string GetShortName(std::string cmodel_path) 
 {
-	std::size_t pos = cmodel_path.find_last_of(xorstr_("\\"));
-	if (pos != std::string::npos)
+	std::size_t pos = cmodel_path.find_last_of("\\");
+	std::string filename;
+	if (pos != std::string::npos) 
 	{
-		return cmodel_path.substr(pos + 1);
+		filename = cmodel_path.substr(pos + 1);
 	}
-	return cmodel_path;
+	else filename = cmodel_path;
+
+	// Удаление расширения .dff
+	pos = filename.rfind(".dff");
+	if (pos != std::string::npos && pos == (filename.length() - 4)) 
+	{ // Проверяем, что .dff находится в конце строки
+		filename = filename.substr(0, pos);
+	}
+
+	// Удаление расширения .txd
+	pos = filename.rfind(".txd");
+	if (pos != std::string::npos && pos == (filename.length() - 4)) 
+	{ // Проверяем, что .txd находится в конце строки
+		filename = filename.substr(0, pos);
+	}
+
+	return filename;
 }
 std::string MakeDrawableName(std::string cmodel_path, DWORD mdl_id, BYTE mdl_type)
 {
@@ -96,28 +178,36 @@ std::string MakeDrawableName(std::string cmodel_path, DWORD mdl_id, BYTE mdl_typ
 	LogInFile(LOG_NAME, xorstr_("MakeDrawableName -> cmodel_path: %s | mdl_id: %d | mdl_type: %d\n"), cmodel_path.c_str(), mdl_id, mdl_type);
 	char drawable_name[500]; memset(drawable_name, 0, sizeof(drawable_name));
 	std::string replacing_id = "";
-	if (mdl_id == 0u) replacing_id = xorstr_("Не выбран");
+	if (mdl_id == 0u) replacing_id = xorstr_("Not selected");
 	else replacing_id = std::to_string(mdl_id);
 	std::string mdlType = "";
-	if (mdl_type == 0u) mdlType = xorstr_("Не указан");
+	if (mdl_type == 0u) mdlType = xorstr_("Not specified");
 	else
 	{
-		if (mdl_type == 1) mdlType = xorstr_("Скин игрока");
-		if (mdl_type == 2) mdlType = xorstr_("Модель автомобиля");
-		if (mdl_type == 3) mdlType = xorstr_("Модель оружия");
-		if (mdl_type > 3) mdlType = xorstr_("Неизвестен");
+		if (mdl_type == 1) mdlType = xorstr_("Player");
+		if (mdl_type == 2) mdlType = xorstr_("Vehicle");
+		if (mdl_type == 3) mdlType = xorstr_("Weapon");
+		if (mdl_type > 3) mdlType = xorstr_("Unknown");
 	}
 	std::string short_name = GetShortName(cmodel_path);
-	snprintf(drawable_name, sizeof(drawable_name), xorstr_("%s | Заменяет ID: %s | Тип: %s"), short_name.c_str(), replacing_id.c_str(), mdlType.c_str());
+	snprintf(drawable_name, sizeof(drawable_name), xorstr_("Model Name: %s | Replacing ID: %s | Type: %s"), short_name.c_str(), replacing_id.c_str(), mdlType.c_str());
 	return std::string(drawable_name);
 }
 void FillModelInfo(std::string cmodel_path)
 {
-	MODEL_CONTAINER mdl_info = ReadModelInfo(cmodel_path);
-	MODEL_TUPLE_1 mdl_first = GetFirstTuple(mdl_info);
-	MODEL_TUPLE_2 mdl_second = GetSecondTuple(mdl_info);
-	std::get<1>(mdl_first) = MakeDrawableName(cmodel_path, std::get<0>(mdl_second), std::get<1>(mdl_second));
-	CModelsList.insert(CModelsList.begin(), MODEL_PAIR(mdl_first, mdl_second));
+	if (cmodel_path.empty())
+	{
+		LogInFile(LOG_NAME, xorstr_("Error: FillModelInfo - empty path.\n"));
+		return;
+	}
+	if (!findStringIC(cmodel_path, xorstr_(".txd"))) // нет надобности парсить и .txd, мы просто допишем расширение вместо .dff
+	{
+		MODEL_CONTAINER mdl_info = ReadModelInfo(cmodel_path);
+		MODEL_TUPLE_1 mdl_first = GetFirstTuple(mdl_info);
+		MODEL_TUPLE_2 mdl_second = GetSecondTuple(mdl_info);
+		std::get<1>(mdl_first) = MakeDrawableName(cmodel_path, std::get<0>(mdl_second), std::get<1>(mdl_second));
+		CModelsList.insert(CModelsList.begin(), MODEL_PAIR(mdl_first, mdl_second));
+	}
 }
 void ParseModels(std::string cmodel_path, std::string extension)
 {
@@ -127,7 +217,6 @@ void ParseModels(std::string cmodel_path, std::string extension)
 	HANDLE MyHandle = FindFirstFileA(cmodel_path.c_str(), &findFileData);
 	if (MyHandle != INVALID_HANDLE_VALUE)
 	{
-		CModelsList.clear();
 		LogInFile(LOG_NAME, xorstr_("ParseModels -> %s\n"), findFileData.cFileName);
 		if (!IsModelExist(findFileData.cFileName)) FillModelInfo(prepare_path + findFileData.cFileName);
 		while (FindNextFileA(MyHandle, &findFileData) != 0)
@@ -146,6 +235,7 @@ void LoadCustomModels()
 		LogInFile(LOG_NAME, xorstr_("LoadCustomModels -> ModelsDir: %s\n"), cmodel_path.c_str());
 		if (!cmodel_path.empty() && cmodel_path.length() > 3)
 		{
+			CModelsList.clear();
 			ParseModels(cmodel_path, xorstr_("\\*.txd"));
 			ParseModels(cmodel_path, xorstr_("\\*.dff"));
 		}
