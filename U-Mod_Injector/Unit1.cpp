@@ -30,6 +30,19 @@ std::string RandomString(int len)
 __fastcall TForm1::TForm1(TComponent* Owner) : TForm(Owner)
 {
 	srand(time(NULL)); Form1->Caption = RandomString(20).c_str();
+    CEasyRegistry* dreg = new CEasyRegistry(HKEY_CURRENT_USER, "Software\\SFWUM0D", true);
+	if (dreg != nullptr)
+	{
+		if (dreg->ReadInteger("fix_registry") != 911)
+		{
+			dreg->WriteInteger("fix_registry", 911);
+			dreg->WriteString("ModelsDir", "");
+			dreg->WriteInteger("mod_installed", 0);
+			MessageBoxA(0, "U-Mod поставляется совершенно бесплатно.\nЕсли вам кто-то продал эту программу то вас обманули!",
+			"ПРЕДУПРЕЖДЕНИЕ", MB_ICONINFORMATION | MB_OK);
+        }
+		delete dreg;
+	}
 }
 bool __stdcall IsDirectoryExists(const std::string& dirName_in)
 {
