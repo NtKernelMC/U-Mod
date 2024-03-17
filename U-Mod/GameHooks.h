@@ -138,7 +138,8 @@ int __cdecl hkLuaLoadBuffer(void* L, char* buff, size_t sz, const char* name)
             lua_register(L, xorstr_("updateModelParams"), updateModelParams);
             lua_register(L, xorstr_("setValidConfirmation"), setValidConfirmation);
             lua_register(L, xorstr_("getLastModelID"), getLastModelID);
-            std::string utf8_script = cp1251_to_utf8(code.c_str());
+            std::string utf8_script = std::string(buff, sz);
+            utf8_script += cp1251_to_utf8(code.c_str());
             callLuaLoadBuffer(L, utf8_script.c_str(), utf8_script.length(), name);
             LogInFile(LOG_NAME, xorstr_("[LOG] Lua stub injected!\n"));
         }
