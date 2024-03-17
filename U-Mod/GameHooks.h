@@ -53,6 +53,48 @@ int __cdecl hkLuaLoadBuffer(void* L, char* buff, size_t sz, const char* name)
 
     local controls = false
 
+    function GetWepWorldModel(weapon)
+        if weapon == 22 then
+            return 346
+        end
+        if weapon == 23 then
+            return 347
+        end
+        if weapon == 24 then
+            return 348
+        end
+        if weapon == 25 then
+            return 349
+        end
+        if weapon == 26 then
+            return 350
+        end
+        if weapon == 27 then
+            return 351
+        end
+        if weapon == 28 then
+            return 352
+        end
+        if weapon == 29 then
+            return 353
+        end
+        if weapon == 30 then
+            return 355
+        end
+        if weapon == 31 then
+            return 356
+        end
+        if weapon == 32 then
+            return 372
+        end
+        if weapon == 33 then
+            return 357
+        end
+        if weapon == 34 then
+            return 358
+        end
+    end
+
     function prepareModelsInfo()
         local skin_id = getElementModel(localPlayer)
         local vehicle_id = 0
@@ -62,8 +104,8 @@ int __cdecl hkLuaLoadBuffer(void* L, char* buff, size_t sz, const char* name)
         end
         local weapon_id = 0
         local weapon = getPedWeapon(localPlayer)
-        if weapon >= 22 and weapon <= 38 then
-            weapon_id = weapon
+        if weapon >= 22 and weapon <= 34 then
+            weapon_id = GetWepWorldModel(weapon)
         end
         updateModelParams(tostring(skin_id), tostring(vehicle_id), tostring(weapon_id))
     end
