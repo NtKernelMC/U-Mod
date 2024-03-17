@@ -7,6 +7,7 @@
 #include <tlhelp32.h>
 #include "Unit1.h"
 #include "Registry.h"
+#include <Vcl.FileCtrl.hpp>
 #include <thread>
 #include <direct.h>
 #include <ctime>
@@ -130,34 +131,32 @@ std::string CvWideToAnsi(const std::wstring& wstr)
 }
 void AskDirectory()
 {
-    CEasyRegistry *reg = new CEasyRegistry(HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\UKRAINEGTA: GLAB3\\Common", false);
+	CEasyRegistry *reg = new CEasyRegistry(HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\UKRAINEGTA: GLAB3\\Common", false);
 	if (reg != nullptr)
 	{
-        std::string lpath = reg->ReadString("GTA:SA Path");
-		std::string game_path = removeSubstring(lpath, "\\game");
+		std::string game_path = reg->ReadString("GTA:SA Path");
 
-		TOpenDialog *OpenDialog = new TOpenDialog(NULL);
+		// Создание диалога выбора директории
+		TFileOpenDialog *OpenDialog = new TFileOpenDialog(NULL);
 
 		// Установка начального каталога
-		OpenDialog->InitialDir = game_path.c_str();
+		OpenDialog->DefaultFolder = game_path.c_str();
 
-		// Настройки диалогового окна
-		OpenDialog->Filter = "DFF файлы (*.dff)|*.DFF|TXD файлы (*.txd)|*.TXD";
-		OpenDialog->FilterIndex = 1;
-		OpenDialog->Options << ofFileMustExist << ofHideReadOnly;
+		// Указываем, что нам нужен выбор папки, а не файла
+		OpenDialog->Options << fdoPickFolders;
 
-		// Показать диалоговое окно
+		// Показываем диалоговое окно
 		if (OpenDialog->Execute())
 		{
-			// Получение выбранного имени файла
+			// Получение выбранного пути к директории
 			std::string dir_path = CvWideToAnsi(OpenDialog->FileName.c_str());
 			CEasyRegistry* dreg = new CEasyRegistry(HKEY_CURRENT_USER, "Software\\SFWUM0D", true);
 			if (dreg != nullptr)
 			{
-				reg->WriteString("ModelsDir", dir_path.c_str());
+				dreg->WriteString("ModelsDir", dir_path.c_str());
 				MessageBoxA(0, "Директория моделей успешно задана!\nПоложите в эту папку ваши .dff и .txd файлы моделей.\nПри следующем запуске игры, модели будут подгружатся именно с этой папки.\nЕсли же вы измените директорию кнопкой \"Изменить директорию моделей\" то вам придется опять указывать какие модели заменять в меню софта.", "Выбор папки", MB_ICONINFORMATION | MB_OK);
 				delete dreg;
-            }
+			}
 		}
 		delete OpenDialog;
 		delete reg;

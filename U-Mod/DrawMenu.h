@@ -118,14 +118,13 @@ const RECT*, const RECT*, HWND wnd, const RGNDATA*)
         {
             for (const auto& item : CModelsList)
             {
-                bool is_selected = (current_select == item.first.c_str());
-                if (ImGui::Selectable(item.first.c_str(), is_selected))
+                bool is_selected = (current_select == std::get<1>(item.first).c_str());
+                if (ImGui::Selectable(std::get<1>(item.first).c_str(), is_selected))
                 {
-                    current_select = item.first.c_str();
+                    current_select = std::get<1>(item.first).c_str();
                     if (is_selected)
                     {
                         ImGui::SetItemDefaultFocus();
-                        //VictimNick = item;
                     }
                 }
             }
@@ -133,7 +132,7 @@ const RECT*, const RECT*, HWND wnd, const RGNDATA*)
         }
         if (ImGui::Button(cp1251_to_utf8(xorstr_("Обновить список")).c_str()))
         {
-
+            LoadCustomModels();
         }
         ImGui::SameLine();
         if (ImGui::Button(cp1251_to_utf8(xorstr_("Применить")).c_str()))

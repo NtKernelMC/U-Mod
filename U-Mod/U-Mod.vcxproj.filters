@@ -143,6 +143,9 @@
     <ClInclude Include="InstallGameHooks.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="ModelsUtils.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="U-Mod.rc">

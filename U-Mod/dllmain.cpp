@@ -37,6 +37,7 @@
 #include "imgui_impl_dx9.h"
 #include "imgui_impl_win32.h"
 #include "PluginUtils.h"
+#include "ModelsUtils.h" // Код загрузки/записи моделей на заменку под ImGUI
 #pragma comment(lib, "libMinHook.x86.lib")
 #pragma comment(lib, "Winmm.lib")
 #include "GameHooks.h"

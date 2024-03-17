@@ -187,6 +187,7 @@
     <ClInclude Include="kthook\ktsignal\include\ktsignal\ktsignal.hpp" />
     <ClInclude Include="lazy_import.h" />
     <ClInclude Include="MinHook.h" />
+    <ClInclude Include="ModelsUtils.h" />
     <ClInclude Include="PebHider.h" />
     <ClInclude Include="PluginUtils.h" />
     <ClInclude Include="Registry.h" />
