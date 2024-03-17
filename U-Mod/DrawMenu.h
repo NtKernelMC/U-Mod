@@ -197,11 +197,8 @@ const RECT*, const RECT*, HWND wnd, const RGNDATA*)
                 if (ImGui::Selectable(mtype_items[n], is_selected)) 
                 {
                     mtype_current = mtype_items[n];
-                    if (is_selected)
-                    {
-                        ImGui::SetItemDefaultFocus();
-                        ValidateModel((char*)mtype_current);
-                    }
+                    ValidateModel((char*)mtype_current);
+                    if (is_selected) ImGui::SetItemDefaultFocus();
                 }
             }
             ImGui::EndCombo();

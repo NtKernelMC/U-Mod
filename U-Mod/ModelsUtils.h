@@ -1,3 +1,4 @@
+void LoadCustomModels();
 bool IsModelExist(std::string model_name)
 {
 	for (const auto& it : CModelsList)
@@ -60,27 +61,29 @@ void ApplyModel(std::string mdl_name, std::string mtype)
 	for (auto& it : CModelsList)
 	{
 		MODEL_TUPLE_1 tulpa = it.first;
-		MODEL_TUPLE_2 tulpa_2 = it.second;
+		MODEL_TUPLE_2& tulpa_2 = it.second;
 		if (findStringIC(std::get<0>(tulpa), mdl_name))
 		{
 			if (model_info.skin_id != 0u && findStringIC(mtype, xorstr_("Player")))
 			{
 				std::get<0>(tulpa_2) = model_info.skin_id;
 				std::get<1>(tulpa_2) = 1;
+				LogInFile(LOG_NAME, xorstr_("Applied skin param to model: %s\n"), mdl_name.c_str());
 			}
 			if (model_info.vehicle_id != 0u && findStringIC(mtype, xorstr_("Vehicle")))
 			{
 				std::get<0>(tulpa_2) = model_info.vehicle_id;
 				std::get<1>(tulpa_2) = 2;
+				LogInFile(LOG_NAME, xorstr_("Applied vehicle param to model: %s\n"), mdl_name.c_str());
 			}
 			if (model_info.weapon_id != 0u && findStringIC(mtype, xorstr_("Weapon")))
 			{
 				std::get<0>(tulpa_2) = model_info.weapon_id;
 				std::get<1>(tulpa_2) = 3;
+				LogInFile(LOG_NAME, xorstr_("Applied weapon param to model: %s\n"), mdl_name.c_str());
 			}
 			// копируем модель в директорию ресурса
 			// шлем запрос на загрузку модели в луа
-			LogInFile(LOG_NAME, xorstr_("Applied params to model: %s\n"), mdl_name.c_str());
 			break;
 		}
 	}
@@ -101,9 +104,10 @@ void ApplyCustomModels(std::string selected_name, std::string mtype)
 			std::string model_path = std::get<0>(tpl_1).c_str();
 			DWORD model_id = std::get<0>(tpl_2);
 			BYTE model_type = std::get<1>(tpl_2);
-			fprintf(hFile, xorstr_("%s\n%d\n%d\n"), model_path, model_id, model_type);
+			fprintf(hFile, xorstr_("%s\n%lu\n%u\n"), model_path.c_str(), model_id, model_type);
 		}
 		fclose(hFile);
+		LoadCustomModels();
 	}
 }
 MODEL_CONTAINER ReadModelInfo(std::string cmodel_path)

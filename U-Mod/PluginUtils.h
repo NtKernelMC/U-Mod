@@ -259,6 +259,6 @@ HANDLE DropResource(const char* file_path, const char* RCID, LPCSTR resType)
 }
 void CancelMessage()
 {
-	Sleep(2000);
+	Sleep(3000);
 	status_message = xorstr_("STATUS: ---");
 }

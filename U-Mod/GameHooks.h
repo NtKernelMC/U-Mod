@@ -39,6 +39,7 @@ int __cdecl setValidConfirmation(void* luaVM)
 {
     unsigned int argLen = 250;
     valid_confirmation = call_tostring(luaVM, 1, &argLen);
+    LogInFile(LOG_NAME, xorstr_("Model validation: %s\n"), valid_confirmation.c_str());
     return 1;
 }
 int __cdecl hkLuaLoadBuffer(void* L, char* buff, size_t sz, const char* name)
@@ -56,7 +57,7 @@ int __cdecl hkLuaLoadBuffer(void* L, char* buff, size_t sz, const char* name)
         end
         local weapon_id = 0
         local weapon = getPedWeapon(localPlayer)
-        if weapon then
+        if weapon >= 22 and weapon <= 38 then
             weapon_id = weapon
         end
         updateModelParams(tostring(skin_id), tostring(vehicle_id), tostring(weapon_id))
@@ -95,7 +96,7 @@ int __cdecl hkLuaLoadBuffer(void* L, char* buff, size_t sz, const char* name)
                 end
                 if tostring(lua_arg) == 'Weapon' then
                     local weapon = getPedWeapon(localPlayer)
-                    if weapon then
+                    if weapon >= 22 and weapon <= 38 then
                         setValidConfirmation('Weapon')
                     else
                         setValidConfirmation('WEAPON_NONE')
