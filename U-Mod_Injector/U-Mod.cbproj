@@ -127,10 +127,15 @@
         <BCC_UseClassicCompiler>false</BCC_UseClassicCompiler>
     </PropertyGroup>
     <ItemGroup>
-        <RcItem Include="..\U-Mod\Release\U-Mod.dll">
+        <RcItem Include="..\U-Mod\Release\U-Mod-Agent.dll">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
-            <ResourceId>UMOD</ResourceId>
+            <ResourceId>AGENT</ResourceId>
+        </RcItem>
+        <RcItem Include="DefLib\websocket-sharp.dll">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>DEFLIB</ResourceId>
         </RcItem>
         <CppCompile Include="Registry.cpp">
             <BuildOrder>3</BuildOrder>
@@ -151,6 +156,11 @@
             <DependentOn>Unit1.h</DependentOn>
             <BuildOrder>2</BuildOrder>
         </CppCompile>
+        <RcItem Include="websocket-sharp.dll">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>LOADER</ResourceId>
+        </RcItem>
         <FormResources Include="Unit1.dfm"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
@@ -243,7 +253,7 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="..\PlayerCloner\output\PlayerCloner.SA.dll" Configuration="Debug" Class="ProjectFile"/>
-                <DeployFile LocalName="..\U-Mod\Release\U-Mod.dll" Configuration="Debug" Class="ProjectFile">
+                <DeployFile LocalName="..\U-Mod\Release\U-Mod-Agent.dll" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
@@ -260,6 +270,18 @@
                 <DeployFile LocalName=".\Win32\Debug\U-Mod.tds" Configuration="Debug" Class="DebugSymbols">
                     <Platform Name="Win32">
                         <RemoteName>U-Mod.tds</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DefLib\websocket-sharp.dll" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="websocket-sharp.dll" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

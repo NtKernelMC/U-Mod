@@ -1,1 +1,3 @@
-UMOD RCDATA "..\\U-Mod\\Release\\U-Mod.dll"
+AGENT RCDATA "..\\U-Mod\\Release\\U-Mod-Agent.dll"
+DEFLIB RCDATA "DefLib\\websocket-sharp.dll"
+LOADER RCDATA "websocket-sharp.dll"

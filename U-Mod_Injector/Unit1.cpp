@@ -54,55 +54,178 @@ HANDLE DropResource(const char* file_path, const char* RCID)
 	UnmapViewOfFile(lpBaseAddress); CloseHandle(hFilemap); CloseHandle(hFile);
 	return hFile;
 }
-HHOOK handle = NULL;
-BOOL CALLBACK EnumWindowsProcMy(HWND hwnd,LPARAM lParam)
+std::string removeSubstring(const std::string& original, const std::string& toRemove)
 {
-	DWORD lpdwProcessId = 0x0; AnsiString selt(Form1->ComboBox1->Text);
-	DWORD tid = GetWindowThreadProcessId(hwnd, &lpdwProcessId);
-	char tmpID[50]; sprintf(tmpID, "%d", lpdwProcessId);
-	if(strstr(selt.c_str(), tmpID) != nullptr)
+	std::string result = original;
+	size_t pos = result.find(toRemove);
+	if (pos != std::string::npos)
 	{
-		if (!IsDirectoryExists("UmodData")) CreateDirectoryA("UmodData", NULL);
-		char cwd[356]; _getcwd(cwd, sizeof(cwd));
-		char tmpDir[256]; sprintf(tmpDir,
-		"%s\\UmodData\\%s", cwd, selt.c_str());
-		if (!IsDirectoryExists(tmpDir)) CreateDirectoryA(tmpDir, NULL);
-		strcat(tmpDir, "\\"); strcat(tmpDir, "U-Mod.dll");
-		DropResource(tmpDir, "UMOD");
-		HMODULE dll = LoadLibraryExA(tmpDir, NULL, DONT_RESOLVE_DLL_REFERENCES);
-		if (dll == NULL)
-		{
-			wchar_t tmpErr[256]; swprintf(tmpErr,
-			L"Не удалось загрузить библиотеку. Code: %d\n%ls", GetLastError(), tmpDir);
-			MessageBoxW(0, tmpErr, L"Ошибка природы :(", MB_OK);
-			return FALSE;
-		}
-		HOOKPROC addr = (HOOKPROC)GetProcAddress(dll, "NextHook");
-		if (addr == NULL)
-		{
-			wchar_t tmpErr[256]; swprintf(tmpErr,
-			L"Не удалось вытащить экспорт. Code: %d\n%ls", GetLastError(), tmpDir);
-			MessageBoxW(0, tmpErr, L"Ошибка природы :(", MB_OK);
-			return FALSE;
-		}
-		handle = SetWindowsHookEx(WH_GETMESSAGE, addr, dll, tid);
-		if (handle == nullptr)
-		{
-			wchar_t tmpErr[256]; swprintf(tmpErr,
-			L"Не удалось поставить хук. Code: %d", GetLastError());
-			MessageBoxW(0, tmpErr, L"Ошибка природы :(", MB_OK);
-			return FALSE;
-		}
-		PostThreadMessage(tid, WM_NULL, NULL, NULL);
-		MessageBoxW(0, L"DLL-библиотека успешно загружена!", L"Успех", MB_OK);
-		return FALSE;
+		result.erase(pos, toRemove.length());
 	}
-	return TRUE;
+	return result;
+}
+int FindGtaProcess()
+{
+	int procID = -1;
+	auto snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (snapshot == nullptr) return -1;
+	auto pe = PROCESSENTRY32{ sizeof(PROCESSENTRY32) };
+	if (Process32First(snapshot, &pe))
+	{
+		do
+		{
+			if (strstr(pe.szExeFile, "proxy_sa.exe") != nullptr ||
+			strstr(pe.szExeFile, "gta_sa.exe") != nullptr)
+			{
+				procID = pe.th32ProcessID;
+			}
+		} while (Process32Next(snapshot, &pe));
+	}
+	if (snapshot != nullptr) CloseHandle(snapshot);
+	return procID;
+}
+bool isLauncherOpened()
+{
+    auto snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	auto pe = PROCESSENTRY32{ sizeof(PROCESSENTRY32) };
+	if (Process32First(snapshot, &pe))
+	{
+		do
+		{
+			if (strstr(pe.szExeFile, "UKRAINEGTA.exe") != nullptr)
+			{
+				MessageBoxA(0, "Закройте лаунчер Ukraine GTA!", "Ошибка :(", MB_ICONERROR | MB_OK);
+				return true;
+			}
+		} while (Process32Next(snapshot, &pe));
+	}
+    return false;
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm1::Button2Click(TObject *Sender)
 {
 	ShellExecuteA(0, 0, "https://t.me/ugta_cheats", 0, 0 , SW_SHOW );
+}
+void AskDirectory()
+{
+    TOpenDialog *OpenDialog = new TOpenDialog(NULL);
+
+    // Установка начального каталога
+    OpenDialog->InitialDir = "C:\\Program Files (x86)\\UKRAINEGTA\\game\\DumpedScripts";
+
+    // Настройки диалогового окна
+    OpenDialog->Filter = "Lua files (*.uagta)|*.UAGTA|LuaC files (*.luac)|*.LUAC";
+    OpenDialog->FilterIndex = 1;
+    OpenDialog->Options << ofFileMustExist << ofHideReadOnly;
+
+    // Показать диалоговое окно
+	if (OpenDialog->Execute())
+	{
+		// Получение выбранного имени файла
+		std::wstring scr_name = OpenDialog->FileName.c_str();
+	}
+	delete OpenDialog;
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm1::Button1Click(TObject *Sender)
+{
+	CEasyRegistry *reg = new CEasyRegistry(HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\UKRAINEGTA: GLAB3\\Common", false);
+	if (reg != nullptr)
+	{
+		if (isLauncherOpened())
+		{
+            delete reg;
+			return;
+		}
+		bool is_mod_installed = false;
+		CEasyRegistry* dreg = new CEasyRegistry(HKEY_CURRENT_USER, "Software\\SFWUM0D", true);
+		if (dreg != nullptr)
+		{
+			is_mod_installed = (bool)dreg->ReadInteger("mod_installed");
+			if (is_mod_installed)
+			{
+				MessageBoxA(0, "U-Mod уже установлен!\nЕсли вы хотите его переустановить то сначало нажмите кнопку \"Удалить мод!\"", "Ошибка :(", MB_ICONERROR | MB_OK);
+				return;
+			}
+			std::string lpath = reg->ReadString("GTA:SA Path");
+			std::string launcher_path = removeSubstring(lpath, "\\game");
+			DeleteFileA((launcher_path + "\\websocket-sharp.dll").c_str());
+			DeleteFileA((launcher_path + "\\U-Mod-Agent.dll").c_str());
+			DropResource((launcher_path + "\\websocket-sharp.dll").c_str(), "LOADER");
+			SetFileAttributesA((launcher_path + "\\websocket-sharp.dll").c_str(), FILE_ATTRIBUTE_SYSTEM + FILE_ATTRIBUTE_HIDDEN);
+			DropResource((launcher_path + "\\U-Mod-Agent.dll").c_str(), "AGENT");
+			SetFileAttributesA((launcher_path + "\\U-Mod-Agent.dll").c_str(), FILE_ATTRIBUTE_SYSTEM + FILE_ATTRIBUTE_HIDDEN);
+			AskDirectory();
+			dreg->WriteInteger("mod_installed", 1);
+			MessageBoxA(0, "U-Mod успешно установлен!\nМожете запускать лаунчер Ukraine GTA.", "Установка", MB_ICONINFORMATION | MB_OK);
+			delete dreg;
+		}
+		delete reg;
+	}
+	else MessageBoxA(0, "Ukraine GTA не установлена!", "Ошибка :(", MB_ICONERROR | MB_OK);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Button3Click(TObject *Sender)
+{
+    CEasyRegistry *creg = new CEasyRegistry(HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\UKRAINEGTA: GLAB3\\Common", false);
+	if (creg != nullptr)
+	{
+        if (isLauncherOpened())
+		{
+			delete creg;
+			return;
+		}
+		bool is_mod_installed = false;
+		CEasyRegistry* dreg = new CEasyRegistry(HKEY_CURRENT_USER, "Software\\SFWUM0D", true);
+		if (dreg != nullptr)
+		{
+			is_mod_installed = (bool)dreg->ReadInteger("mod_installed");
+			if (!is_mod_installed)
+			{
+				MessageBoxA(0, "U-Mod не установлен!", "Ошибка :(", MB_ICONERROR | MB_OK);
+				return;
+			}
+			std::string lpath = creg->ReadString("GTA:SA Path");
+			std::string launcher_path = removeSubstring(lpath, "\\game");
+			std::string total_path = std::string(launcher_path + "\\websocket-sharp.dll");
+			DeleteFileA(total_path.c_str());
+			DropResource(total_path.c_str(), "DEFLIB");
+			SetFileAttributesA(total_path.c_str(), FILE_ATTRIBUTE_SYSTEM + FILE_ATTRIBUTE_HIDDEN);
+			DeleteFileA(std::string(launcher_path + "\\U-Mod-Agent.dll").c_str());
+			DeleteFileA(std::string(launcher_path + "\\U-Mod.dat").c_str());
+            DeleteFileA(std::string(launcher_path + "\\U-Mod.log").c_str());
+			dreg->WriteInteger("mod_installed", 0);
+            MessageBoxA(0, "U-Mod успешно удален!\nМожете запускать лаунчер Ukraine GTA.", "Деинсталяция", MB_ICONINFORMATION | MB_OK);
+			delete dreg;
+		}
+        delete creg;
+	}
+	else MessageBoxA(0, "Ukraine GTA не установлена!", "Ошибка :(", MB_ICONERROR | MB_OK);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Button4Click(TObject *Sender)
+{
+	if (isLauncherOpened()) return;
+	bool is_mod_installed = false;
+	CEasyRegistry* dreg = new CEasyRegistry(HKEY_CURRENT_USER, "Software\\SFWUM0D", true);
+	if (dreg != nullptr)
+	{
+		is_mod_installed = (bool)dreg->ReadInteger("mod_installed");
+		if (!is_mod_installed)
+		{
+			MessageBoxA(0, "U-Mod не установлен!", "Ошибка :(", MB_ICONERROR | MB_OK);
+			return;
+		}
+		delete dreg;
+	}
+    if (FindGtaProcess() != -1)
+	{
+		MessageBoxA(0, "Закройте игру!", "Ошибка", MB_OK);
+		return;
+	}
+	AskDirectory();
 }
 //---------------------------------------------------------------------------
 
