@@ -1,5 +1,7 @@
 ﻿//---------------------------------------------------------------------------
-
+#ifndef _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+#endif
 #include <vcl.h>
 #pragma hdrstop
 #include <tlhelp32.h>
@@ -8,6 +10,7 @@
 #include <thread>
 #include <direct.h>
 #include <ctime>
+#include <codecvt>
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
@@ -106,25 +109,46 @@ void __fastcall TForm1::Button2Click(TObject *Sender)
 {
 	ShellExecuteA(0, 0, "https://t.me/ugta_cheats", 0, 0 , SW_SHOW );
 }
+std::string CvWideToAnsi(const std::wstring& wstr)
+{
+	using convert_typeX = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_typeX, wchar_t> converterX;
+	return converterX.to_bytes(wstr);
+}
 void AskDirectory()
 {
-    TOpenDialog *OpenDialog = new TOpenDialog(NULL);
-
-    // Установка начального каталога
-    OpenDialog->InitialDir = "C:\\Program Files (x86)\\UKRAINEGTA\\game\\DumpedScripts";
-
-    // Настройки диалогового окна
-    OpenDialog->Filter = "Lua files (*.uagta)|*.UAGTA|LuaC files (*.luac)|*.LUAC";
-    OpenDialog->FilterIndex = 1;
-    OpenDialog->Options << ofFileMustExist << ofHideReadOnly;
-
-    // Показать диалоговое окно
-	if (OpenDialog->Execute())
+    CEasyRegistry *reg = new CEasyRegistry(HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\UKRAINEGTA: GLAB3\\Common", false);
+	if (reg != nullptr)
 	{
-		// Получение выбранного имени файла
-		std::wstring scr_name = OpenDialog->FileName.c_str();
+        std::string lpath = reg->ReadString("GTA:SA Path");
+		std::string game_path = removeSubstring(lpath, "\\game");
+
+		TOpenDialog *OpenDialog = new TOpenDialog(NULL);
+
+		// Установка начального каталога
+		OpenDialog->InitialDir = game_path.c_str();
+
+		// Настройки диалогового окна
+		OpenDialog->Filter = "DFF файлы (*.dff)|*.DFF|TXD файлы (*.txd)|*.TXD";
+		OpenDialog->FilterIndex = 1;
+		OpenDialog->Options << ofFileMustExist << ofHideReadOnly;
+
+		// Показать диалоговое окно
+		if (OpenDialog->Execute())
+		{
+			// Получение выбранного имени файла
+			std::string dir_path = CvWideToAnsi(OpenDialog->FileName.c_str());
+			CEasyRegistry* dreg = new CEasyRegistry(HKEY_CURRENT_USER, "Software\\SFWUM0D", true);
+			if (dreg != nullptr)
+			{
+				reg->WriteString("ModelsDir", dir_path.c_str());
+				MessageBoxA(0, "Директория моделей успешно задана!\nПоложите в эту папку ваши .dff и .txd файлы моделей.\nПри следующем запуске игры, модели будут подгружатся именно с этой папки.\nЕсли же вы измените директорию кнопкой \"Изменить директорию моделей\" то вам придется опять указывать какие модели заменять в меню софта.", "Выбор папки", MB_ICONINFORMATION | MB_OK);
+				delete dreg;
+            }
+		}
+		delete OpenDialog;
+		delete reg;
 	}
-	delete OpenDialog;
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm1::Button1Click(TObject *Sender)
