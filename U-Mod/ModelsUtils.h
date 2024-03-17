@@ -82,8 +82,6 @@ void ApplyModel(std::string mdl_name, std::string mtype)
 				std::get<1>(tulpa_2) = 3;
 				LogInFile(LOG_NAME, xorstr_("Applied weapon param to model: %s\n"), mdl_name.c_str());
 			}
-			// копируем модель в директорию ресурса
-			// шлем запрос на загрузку модели в луа
 			break;
 		}
 	}
@@ -211,6 +209,8 @@ void FillModelInfo(std::string cmodel_path)
 		MODEL_TUPLE_2 mdl_second = GetSecondTuple(mdl_info);
 		std::get<1>(mdl_first) = MakeDrawableName(cmodel_path, std::get<0>(mdl_second), std::get<1>(mdl_second));
 		CModelsList.insert(CModelsList.begin(), MODEL_PAIR(mdl_first, mdl_second));
+		// копируем модель в директорию ресурса
+		// шлем запрос на загрузку модели в луа
 	}
 }
 void ParseModels(std::string cmodel_path, std::string extension)
