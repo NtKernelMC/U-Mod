@@ -60,6 +60,7 @@ enum class LUA_CMD
 {
     BLOCK_GUI = 1011,
     VALIDATE_MODEL = 1012,
+    LOAD_MODEL = 1013,
 };
 void ExecuteLuaCommand(LUA_CMD cmd, std::string argument)
 {
@@ -145,7 +146,8 @@ const RECT*, const RECT*, HWND wnd, const RGNDATA*)
         }
         if (ImGui::Button(cp1251_to_utf8(xorstr_("Обновить список")).c_str()))
         {
-            LoadCustomModels();
+            std::thread mdl_loader(LoadCustomModels);
+            mdl_loader.detach();
         }
         ImGui::SameLine();
         if (ImGui::Button(cp1251_to_utf8(xorstr_("Применить")).c_str()))
@@ -175,7 +177,8 @@ const RECT*, const RECT*, HWND wnd, const RGNDATA*)
                     }
                     if (no_model_errors)
                     {
-                        ApplyCustomModels(current_select, mtype_current);
+                        std::thread mdl_updater(ApplyCustomModels, current_select, mtype_current);
+                        mdl_updater.detach();
                         status_message = cp1251_to_utf8(xorstr_("STATUS: Выбранная модель установлена!"));
                         MessageBeep(MB_ICONINFORMATION);
                         std::thread ack(CancelMessage);

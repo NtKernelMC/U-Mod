@@ -59,6 +59,7 @@ bool HackInjectAvailable = false;
 std::string valid_confirmation = "";
 std::string gLuaCode = "";
 std::string gLuaArg = "";
+DWORD lastModelID = 0;
 char inp_txt[256];
 typedef std::map<std::tuple<std::string, std::string>, std::tuple<DWORD, BYTE>> MODEL_CONTAINER;
 typedef std::pair<std::tuple<std::string, std::string>, std::tuple<DWORD, BYTE>> MODEL_PAIR;

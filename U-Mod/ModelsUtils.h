@@ -230,9 +230,18 @@ void FillModelInfo(std::string cmodel_path)
 			LogInFile(LOG_NAME, "[LOG] Copied file: %s to %s | %d\n", orig_txd.c_str(), txd_name.c_str(), (int)rslt);
 			rslt = CopyFileA(cmodel_path.c_str(), dff_name.c_str(), FALSE);
 			LogInFile(LOG_NAME, "[LOG] Copied file: %s to %s | %d\n", orig_txd.c_str(), txd_name.c_str(), (int)rslt);
-			delete reg;
+			if (std::get<0>(mdl_second) != 0u)
+			{
+				lastModelID = std::get<0>(mdl_second);
+				HackInjectAvailable = true;
+				char cmd_str[256]; memset(cmd_str, 0, sizeof(cmd_str));
+				sprintf(cmd_str, xorstr_("%d"), 1013);
+				gLuaCode = cmd_str;
+				gLuaArg = short_name;
+				delete reg;
+				Sleep(1000);
+			}
 		}
-		// шлем запрос на загрузку модели в луа
 	}
 }
 void ParseModels(std::string cmodel_path, std::string extension)
