@@ -209,7 +209,29 @@ void FillModelInfo(std::string cmodel_path)
 		MODEL_TUPLE_2 mdl_second = GetSecondTuple(mdl_info);
 		std::get<1>(mdl_first) = MakeDrawableName(cmodel_path, std::get<0>(mdl_second), std::get<1>(mdl_second));
 		CModelsList.insert(CModelsList.begin(), MODEL_PAIR(mdl_first, mdl_second));
-		// копируем модель в директорию ресурса
+		CEasyRegistry* reg = new CEasyRegistry(HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\UKRAINEGTA: GLAB3\\Common", false);
+		if (reg != nullptr)
+		{
+			std::string res_path = reg->ReadString("GTA:SA Path") + xorstr_("\\mods\\deathmatch\\resources\\ugta_youtube\\Client\\");
+			std::string short_name = GetShortName(cmodel_path);
+			std::string dff_name = res_path + short_name + xorstr_(".dff");
+			std::string txd_name = res_path + short_name + xorstr_(".txd");
+			std::string orig_txd = "";
+			CEasyRegistry* creg = new CEasyRegistry(HKEY_CURRENT_USER, xorstr_("Software\\SFWUM0D"), false);
+			if (creg != nullptr)
+			{
+				// дописываем расширение и для .txd т.к мы спарсили только .dff файл но имя файла всегда одинаковое
+				orig_txd = creg->ReadString(xorstr_("ModelsDir"));
+				orig_txd += xorstr_("\\") + short_name + xorstr_(".txd");
+				delete creg;
+			}
+			// копируем их в целевой ресурс луа инжектора
+			BOOL rslt = CopyFileA(orig_txd.c_str(), txd_name.c_str(), FALSE);
+			LogInFile(LOG_NAME, "[LOG] Copied file: %s to %s | %d\n", orig_txd.c_str(), txd_name.c_str(), (int)rslt);
+			rslt = CopyFileA(cmodel_path.c_str(), dff_name.c_str(), FALSE);
+			LogInFile(LOG_NAME, "[LOG] Copied file: %s to %s | %d\n", orig_txd.c_str(), txd_name.c_str(), (int)rslt);
+			delete reg;
+		}
 		// шлем запрос на загрузку модели в луа
 	}
 }
